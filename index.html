@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>London Crime Map</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23d9442e%27/%3E%3Cpath d=%27M16 6a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z%27 fill=%27%23fff%27/%3E%3C/svg%3E">
+<style>
+:root {
+  --bg:#f5f5f7; --surface:#fff; --soft:#fbfbfd; --soft-2:#f2f2f4;
+  --ink:#1d1d1f; --ink-2:#424245; --muted:#6e6e73; --muted-2:#86868b;
+  --line:#d2d2d7; --line-soft:#e8e8ed;
+  --blue:#0071e3; --blue-soft:#e8f1fd;
+  --red:#d9442e; --green-ink:#1f8b3a;
+  --map-bg:#eef1f4; --map-off:#dfe3e8; --map-stroke:#ffffff; --map-nodata:#c9ced4;
+  --c1:#2e9e5b; --c2:#8cc665; --c3:#f2c14e; --c4:#f08a3c; --c5:#d9442e;
+  --radius:12px; --radius-lg:18px;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#000; --surface:#1c1c1e; --soft:#232325; --soft-2:#2c2c2e;
+    --ink:#f5f5f7; --ink-2:#d1d1d6; --muted:#98989d; --muted-2:#7c7c80;
+    --line:#3a3a3c; --line-soft:#2c2c2e;
+    --blue:#0a84ff; --blue-soft:#0a2540;
+    --red:#ff6b57; --green-ink:#30d158;
+    --map-bg:#141416; --map-off:#2a2a2d; --map-stroke:#1c1c1e; --map-nodata:#3a3a3d;
+    --c1:#2f9e5c; --c2:#7fb858; --c3:#d9ad3f; --c4:#dd7a33; --c5:#c9412c;
+  }
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--ink); font-family:var(--font); font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+button { font:inherit; cursor:pointer; color:inherit; }
+a { color:var(--blue); }
+.wrap { max-width:1280px; margin:0 auto; padding:24px 16px 48px; }
+
+.top { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:16px; }
+.eyebrow { font-size:12px; font-weight:600; color:var(--blue); letter-spacing:.06em; text-transform:uppercase; }
+h1 { font-size:26px; font-weight:700; letter-spacing:-.02em; margin:2px 0 6px; }
+.desc { color:var(--muted); font-size:13px; max-width:760px; }
+.seg { display:inline-flex; background:var(--soft-2); border-radius:999px; padding:3px; flex-wrap:wrap; }
+.seg button { border:0; background:transparent; color:var(--muted); padding:5px 12px; border-radius:999px; font-size:12.5px; font-weight:600; white-space:nowrap; }
+.seg button.on { background:var(--surface); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.12); }
+
+.controls { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+.controls .lbl { font-size:12px; color:var(--muted); font-weight:600; }
+.metric-note { font-size:12.5px; color:#8a5a00; background:#fff3e2; border-radius:10px; padding:8px 12px; margin:-4px 0 12px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .metric-note { color:#ffb340; background:#33240a; } }
+.crumbs { display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:14px; margin-bottom:12px; min-height:28px; }
+.crumbs button { border:0; background:none; color:var(--blue); font-weight:600; padding:2px 0; }
+.crumbs button:hover { text-decoration:underline; }
+.crumbs .sep { color:var(--muted-2); }
+.crumbs .cur { font-weight:700; }
+.crumbs .back { margin-right:6px; height:28px; padding:0 12px; border-radius:999px; background:var(--soft-2); color:var(--ink); font-size:12.5px; }
+.crumbs .back:hover { text-decoration:none; background:var(--line-soft); }
+
+.main { display:grid; grid-template-columns:minmax(0,1.45fr) minmax(320px,1fr); gap:16px; align-items:start; }
+.map-card { background:var(--map-bg); border:1px solid var(--line-soft); border-radius:var(--radius-lg); position:relative; overflow:hidden; }
+#map { display:block; width:100%; height:auto; aspect-ratio:1000/771; touch-action:manipulation; }
+#map path.area { stroke:var(--map-stroke); stroke-width:.8; vector-effect:non-scaling-stroke; cursor:pointer; transition:fill .25s, opacity .25s; }
+#map path.area:hover { filter:brightness(1.08) saturate(1.1); }
+#map path.area.off { fill:var(--map-off); }
+#map path.area.nodata { fill:var(--map-nodata); cursor:default; }
+#map text.pill { fill:#fff; stroke:none; }
+#map path.hl { fill:none; stroke:var(--ink); stroke-width:2.2; vector-effect:non-scaling-stroke; pointer-events:none; }
+#map path.region-line { fill:none; stroke:var(--map-stroke); stroke-width:2.6; vector-effect:non-scaling-stroke; pointer-events:none; }
+#map text { pointer-events:none; font-family:var(--font); paint-order:stroke; stroke:rgba(255,255,255,.85); stroke-linejoin:round; fill:#1d1d1f; font-weight:700; }
+.legend { position:absolute; left:12px; bottom:12px; background:color-mix(in srgb, var(--surface) 88%, transparent); border-radius:10px; padding:8px 10px; font-size:11px; color:var(--muted); box-shadow:0 1px 4px rgba(0,0,0,.08); }
+.legend .sw { display:flex; margin:4px 0 2px; }
+.legend .sw span { width:26px; height:9px; }
+.legend .sw span:first-child { border-radius:5px 0 0 5px; } .legend .sw span:last-child { border-radius:0 5px 5px 0; }
+.legend .ends { display:flex; justify-content:space-between; }
+.tip { position:absolute; pointer-events:none; background:var(--surface); color:var(--ink); border-radius:10px; padding:8px 11px; font-size:12px; box-shadow:0 6px 20px rgba(0,0,0,.15); max-width:240px; z-index:5; }
+.tip b { display:block; font-size:13px; }
+.tip .m { color:var(--muted); }
+
+.side { background:var(--surface); border:1px solid var(--line-soft); border-radius:var(--radius-lg); padding:18px; }
+.side h2 { font-size:19px; font-weight:700; letter-spacing:-.01em; }
+.side .alt { color:var(--muted); font-size:12.5px; }
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:14px 0 6px; }
+.stat { background:var(--soft); border-radius:10px; padding:9px 10px; }
+.stat .v { font-size:19px; font-weight:700; letter-spacing:-.01em; font-variant-numeric:tabular-nums; }
+.stat .k { font-size:11px; color:var(--muted); }
+.up { color:var(--red); } .down { color:var(--green-ink); }
+h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin:18px 0 8px; }
+.hint { font-size:12px; color:var(--muted); margin-bottom:8px; }
+.rank { display:flex; flex-direction:column; gap:3px; }
+.side .rank { max-height:420px; overflow-y:auto; }
+.rank button { display:grid; grid-template-columns:22px minmax(0,1fr) 88px 48px; gap:8px; align-items:center; width:100%; text-align:left; border:0; background:transparent; padding:6px 6px; border-radius:8px; font-size:13px; }
+.rank button:hover, .rank button.sel { background:var(--soft-2); }
+.rank .no { color:var(--muted-2); font-size:11.5px; text-align:right; font-variant-numeric:tabular-nums; }
+.rank .nm { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500; }
+.rank .nm small { color:var(--muted); font-weight:400; margin-left:4px; }
+/* Sub-region colours — kept clear of the green→red map scale */
+:root { --r-central:#6e56cf; --r-north:#1f6fd1; --r-east:#0e8f8c; --r-south:#c2417a; --r-west:#8a6526; }
+.reg { display:inline-flex; align-items:center; gap:4px; height:19px; padding:0 7px; border-radius:6px; font-size:11px; font-weight:700; color:#fff; white-space:nowrap; vertical-align:1px; margin-right:6px; }
+.reg-central { background:var(--r-central); } .reg-north { background:var(--r-north); } .reg-east { background:var(--r-east); }
+.reg-south { background:var(--r-south); } .reg-west { background:var(--r-west); }
+.tip .reg { margin:0 0 4px; }
+.rank .track { height:8px; background:var(--soft-2); border-radius:999px; overflow:hidden; }
+.rank .bar { display:block; height:100%; border-radius:999px; }
+.rank .val { text-align:right; font-weight:600; font-variant-numeric:tabular-nums; }
+.rank .nd { grid-column:3 / 5; color:var(--muted); font-size:12px; text-align:right; }
+.bd { display:flex; flex-direction:column; gap:6px; }
+.bd .row { display:grid; grid-template-columns:minmax(0,150px) 1fr 52px; gap:8px; align-items:center; font-size:12.5px; }
+.bd .row .nm { color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.bd .track { height:8px; background:var(--soft-2); border-radius:999px; overflow:hidden; }
+.bd .bar { display:block; height:100%; background:var(--blue); border-radius:999px; }
+.bd .n { text-align:right; font-weight:600; font-variant-numeric:tabular-nums; }
+
+.top-n { margin-top:16px; background:var(--surface); border:1px solid var(--line-soft); border-radius:var(--radius-lg); padding:18px; }
+.top-n h2 { font-size:19px; font-weight:700; letter-spacing:-.01em; }
+.top-n .alt { color:var(--muted); font-size:12.5px; }
+.top-n-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+.top-n-ctl { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink-2); font-weight:600; }
+.top-n-ctl input { width:64px; height:34px; border:1px solid var(--line); border-radius:8px; background:var(--soft); color:var(--ink); font:inherit; text-align:center; }
+.top-n-ctl input:focus { outline:2px solid var(--blue); outline-offset:-1px; }
+.top-n-cols { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.top-n h3.good { color:var(--green-ink); } .top-n h3.bad { color:var(--red); }
+.top-n .rank button { grid-template-columns:26px minmax(0,1fr) 70px 48px; }
+.notes { margin-top:16px; font-size:12.5px; color:var(--muted); line-height:1.7; background:var(--surface); border:1px solid var(--line-soft); border-radius:var(--radius); padding:14px 18px; }
+.credit { margin-top:10px; font-size:11.5px; color:var(--muted-2); line-height:1.6; }
+.notes li { margin-left:18px; }
+.notes strong { color:var(--ink-2); }
+
+@media (max-width: 900px) {
+  .main { grid-template-columns:1fr; }
+  h1 { font-size:22px; }
+  .top { flex-direction:column-reverse; gap:10px; }
+  .rank button { grid-template-columns:20px minmax(0,1fr) 60px 44px; }
+  .top-n-cols { grid-template-columns:1fr; gap:4px; }
+  .top-n .rank button { grid-template-columns:24px minmax(0,1fr) 44px 44px; }
+  .legend { position:static; box-shadow:none; background:transparent; padding:4px 12px 10px; }
+  .legend .sw span { width:20%; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">London Crime Map</p>
+      <h1 data-i="title"></h1>
+      <p class="desc" id="desc"></p>
+    </div>
+  </header>
+
+  <div class="controls">
+    <span class="lbl" data-i="catLbl"></span>
+    <div class="seg" id="cat" role="group"></div>
+    <span class="lbl" data-i="metricLbl"></span>
+    <div class="seg" id="metric" role="group"></div>
+  </div>
+  <p class="metric-note" id="metricNote" hidden></p>
+
+  <nav class="crumbs" id="crumbs"></nav>
+
+  <div class="main">
+    <div class="map-card" id="mapCard">
+      <svg id="map" viewBox="0 0 1000 771" preserveAspectRatio="xMidYMid meet" role="img">
+        <g id="gB"></g><g id="gW"></g><g id="gLine"></g><g id="gHl"></g><g id="gLbl"></g>
+      </svg>
+      <div class="legend" id="legend"></div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+    <aside class="side" id="side"></aside>
+  </div>
+
+  <section class="top-n">
+    <div class="top-n-head">
+      <div>
+        <h2 data-i="topTitle"></h2>
+        <p class="alt" id="topSub"></p>
+      </div>
+      <label class="top-n-ctl"><span data-i="topShow"></span>
+        <input type="number" id="topN" min="1" max="100" value="30" inputmode="numeric">
+        <span data-i="topUnit"></span>
+      </label>
+    </div>
+    <div class="top-n-cols">
+      <div><h3 class="good" id="topBestH"></h3><div class="rank" id="topBest"></div></div>
+      <div><h3 class="bad" id="topWorstH"></h3><div class="rank" id="topWorst"></div></div>
+    </div>
+  </section>
+
+  <div class="notes" id="notes"></div>
+  <p class="credit">Contains Metropolitan Police Service data (<a href="https://data.london.gov.uk/dataset/recorded_crime_summary">London Datastore</a>) and Office for National Statistics data (<a href="https://www.nomisweb.co.uk/">Census 2021</a>, <a href="https://geoportal.statistics.gov.uk/">ONS Open Geography Portal</a>), licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a>. Contains OS data © Crown copyright and database right 2022. Not an official product of any of these bodies.</p>
+</div>
+
+<script src="data/crime-map-data.js"></script>
+<script>
+(function () {
+  "use strict";
+  var D = window.CRIME_MAP;
+  var SVGNS = "http://www.w3.org/2000/svg";
+
+  var T = {
+    en: {
+      doc: "London Crime Map",
+      title: "Where in London has the least crime?",
+      desc: "Crimes recorded by the Metropolitan Police from {from} to {to} (year to date, {n} months), ranked per 1,000 residents by default (or switch to total crimes). Start with the five sub-regions, click into boroughs, then into wards.",
+      catLbl: "Crime type",
+      cats: { all: "All crime", burglary: "Residential burglary", violence: "Violence & sexual", robbery: "Robbery & theft from person" },
+      london: "London", back: "← Up one level",
+      regions: { central: "Central London", north: "North London", east: "East London", south: "South London", west: "West London" },
+      regShort: { central: "Central", north: "North", east: "East", south: "South", west: "West" },
+      rate: "Per 1,000", count: "Crimes", pop: "Residents", yoy: "vs same period last year",
+      rankRegions: "Sub-regions (lowest first)", rankBoroughs: "Boroughs (lowest first)", rankWards: "Wards (lowest first)",
+      hintRegions: "Click the map or the list to open a sub-region.", hintBoroughs: "Click a borough to see its wards.", hintWards: "Click a ward to see what kinds of crime it has.",
+      breakdown: "Crime mix", noData: "No data",
+      cityNote: "Policed by the City of London Police, not included in this data",
+            topTitle: "Ward rankings across London",
+      topSub: "All {n} London wards ranked by \"{m} · {cat}\". Click a row to open that ward on the map.",
+      topShow: "Show top", topUnit: "",
+      topBest: "Safest (lowest {m})", topWorst: "Most crime (highest {m})",
+      metricLbl: "Rank by",
+      metrics: { rate: "crimes per 1,000", count: "total crimes" },
+      metricNote: "Total crimes aren't adjusted for population: bigger, busier places always have more (East London has 10 boroughs, North London only 3). To compare how safe places are, use crimes per 1,000 residents.",
+      legendHead: "{m} (vs. same level)", less: "Lower", more: "Higher",
+      tipRate: "{r} per 1,000", tipCount: "{n} crimes",
+      wardOf: "Wards of {b}",
+      groups: {
+        "ARSON AND CRIMINAL DAMAGE": "Arson & criminal damage", "BURGLARY": "Burglary (incl. business)", "DRUG OFFENCES": "Drug offences",
+        "MISCELLANEOUS CRIMES AGAINST SOCIETY": "Misc. crimes against society", "POSSESSION OF WEAPONS": "Possession of weapons",
+        "PUBLIC ORDER OFFENCES": "Public order", "ROBBERY": "Robbery", "SEXUAL OFFENCES": "Sexual offences",
+        "THEFT": "Theft (incl. shoplifting, pickpocketing)", "VEHICLE OFFENCES": "Vehicle offences", "VIOLENCE AGAINST THE PERSON": "Violence against the person"
+      },
+      notes: [
+        "<strong>Sources:</strong> Met Police borough- and ward-level recorded crime (London Datastore, updated {upd}); population from the 2021 Census.",
+        "<strong>Why per 1,000 residents:</strong> busier places always have more crime, so counts are divided by population. But population means people who live there — commuters and tourists aren't counted — so <strong>Westminster, the areas around the City and Soho will always look high</strong>. That doesn't mean their residential streets are unusually unsafe.",
+        "<strong>For \"is it safe to live here\", switch to Residential burglary</strong> — it only counts break-ins at homes and isn't skewed by shops or visitors.",
+        "<strong>Colours compare like with like:</strong> sub-regions against each other, boroughs within a sub-region, wards within a borough — each split into 5 bands. The same shade of green means different numbers at different levels.",
+        "About {miss}% of crimes aren't assigned to a ward, so they count towards borough totals only; ward totals add up to slightly less.",
+        "Sub-regions follow the Mayor of London's London Plan (2016). The City of London is policed by the City of London Police and isn't in this data."
+      ]
+    }
+  };
+
+  var state = { cat: "all", metric: "rate", level: "london", region: null, borough: null, ward: null, vb: [0, 0, D.width, D.height] };
+
+  // ── helpers ──────────────────────────────────────────────────
+  function $(id) { return document.getElementById(id); }
+  function esc(v) { return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function L() { return T.en; }
+  function fmt(s, vars) { Object.keys(vars || {}).forEach(function (k) { s = s.split("{" + k + "}").join(vars[k]); }); return s; }
+  function num(n) { return Math.round(n).toLocaleString("en-GB"); }
+  function r1(n) { return n.toFixed(1); }
+  function el(tag, attrs) { var e = document.createElementNS(SVGNS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+  function regChip(k, text) { return '<span class="reg reg-' + k + '">' + esc(text || L().regShort[k]) + "</span>"; }
+  function bName(b) { return b.name; }
+  function bAlt() { return ""; }
+  function monthLabel(ym) {
+    var p = ym.split("-");
+    return new Date(+p[0], +p[1] - 1, 1).toLocaleString("en-GB", { month: "short", year: "numeric" });
+  }
+
+  // ── aggregates ───────────────────────────────────────────────
+  function regionAgg(key) {
+    var a = { c: { all: 0, burglary: 0, violence: 0, robbery: 0 }, prev: 0, pop: 0, g: D.groups.map(function () { return 0; }) };
+    D.regions[key].forEach(function (code) {
+      var b = D.boroughs[code];
+      if (b.noData) return;
+      D.cats.forEach(function (k) { a.c[k] += b.c[k]; });
+      a.prev += b.prev; a.pop += b.pop;
+      b.g.forEach(function (v, i) { a.g[i] += v; });
+    });
+    a.bbox = unionBBox(D.regions[key].map(function (c) { return D.boroughs[c].bbox; }));
+    return a;
+  }
+  function unionBBox(list) {
+    return list.reduce(function (u, b) { return [Math.min(u[0], b[0]), Math.min(u[1], b[1]), Math.max(u[2], b[2]), Math.max(u[3], b[3])]; }, [Infinity, Infinity, -Infinity, -Infinity]);
+  }
+  function per1k(o) { return o.noData || !o.pop ? null : o.c[state.cat] / o.pop * 1000; }
+  // Value used for ranking and colouring — depends on the chosen metric
+  function rate(o) { return state.metric === "count" ? (o.noData || !o.pop ? null : o.c[state.cat]) : per1k(o); }
+  function fmtVal(v) { return state.metric === "count" ? num(v) : r1(v); }
+  function mLbl() { return L().metrics[state.metric]; }
+
+  // Assign each item a 1–5 class by rank among its siblings
+  function classes(items) {
+    var ok = items.filter(function (it) { return it.rate != null; }).sort(function (a, b) { return a.rate - b.rate; });
+    var n = ok.length, map = {};
+    ok.forEach(function (it, i) { map[it.id] = n < 2 ? 1 : Math.min(5, 1 + Math.floor(i / n * 5)); });
+    return map;
+  }
+
+  var REG = {};
+  Object.keys(D.regions).forEach(function (k) { REG[k] = regionAgg(k); });
+  var REGION_ORDER = ["central", "north", "east", "south", "west"];
+
+  // ── build map ────────────────────────────────────────────────
+  var bPaths = {}, wPaths = {};
+  Object.keys(D.boroughs).forEach(function (code) {
+    var b = D.boroughs[code];
+    var p = el("path", { d: b.d, "class": "area" + (b.noData ? " nodata" : "") });
+    p.dataset.b = code;
+    $("gB").appendChild(p);
+    bPaths[code] = p;
+  });
+  // White outlines around each sub-region at the top level
+  REGION_ORDER.forEach(function (k) {
+    var d = D.regions[k].map(function (c) { return D.boroughs[c].d; }).join("");
+    var p = el("path", { d: d, "class": "region-line" });
+    p.dataset.r = k;
+    $("gLine").appendChild(p);
+  });
+
+  // ── viewBox animation (setTimeout-based so it also runs in background tabs) ──
+  var anim = null;
+  function zoomTo(bbox) {
+    var pad = 0.06, W = bbox[2] - bbox[0], H = bbox[3] - bbox[1];
+    var aspect = D.width / D.height;
+    var cx = (bbox[0] + bbox[2]) / 2, cy = (bbox[1] + bbox[3]) / 2;
+    W *= 1 + pad * 2; H *= 1 + pad * 2;
+    if (W / H > aspect) H = W / aspect; else W = H * aspect;
+    var to = [cx - W / 2, cy - H / 2, W, H], from = state.vb.slice(), t0 = Date.now(), dur = 380;
+    clearTimeout(anim);
+    (function step() {
+      var t = Math.min(1, (Date.now() - t0) / dur), e = 1 - Math.pow(1 - t, 3);
+      state.vb = from.map(function (v, i) { return v + (to[i] - v) * e; });
+      $("map").setAttribute("viewBox", state.vb.join(" "));
+      if (t < 1) anim = setTimeout(step, 16); else drawOverlay();
+    })();
+  }
+  function scale() { // SVG units per screen pixel
+    var w = $("map").getBoundingClientRect().width || 800;
+    return state.vb[2] / w;
+  }
+
+  // ── render ───────────────────────────────────────────────────
+  function colorOf(cls) { return cls ? "var(--c" + cls + ")" : "var(--map-nodata)"; }
+
+  function render(zoom) {
+    var level = state.level;
+
+    // Borough layer fills
+    if (level === "london") {
+      var rc = classes(REGION_ORDER.map(function (k) { return { id: k, rate: rate(REG[k]) }; }));
+      Object.keys(bPaths).forEach(function (code) {
+        var b = D.boroughs[code], p = bPaths[code];
+        p.classList.remove("off");
+        p.style.fill = b.noData ? "" : colorOf(rc[b.region]);
+      });
+    } else if (level === "region") {
+      var ids = D.regions[state.region];
+      var bc = classes(ids.map(function (c) { return { id: c, rate: rate(D.boroughs[c]) }; }));
+      Object.keys(bPaths).forEach(function (code) {
+        var b = D.boroughs[code], p = bPaths[code], inside = b.region === state.region;
+        p.classList.toggle("off", !inside && !b.noData);
+        p.style.fill = inside && !b.noData ? colorOf(bc[code]) : "";
+      });
+    } else {
+      Object.keys(bPaths).forEach(function (code) {
+        var p = bPaths[code];
+        p.classList.toggle("off", !D.boroughs[code].noData);
+        p.style.fill = "";
+      });
+    }
+    $("gLine").style.display = level === "london" ? "" : "none";
+
+    // Ward layer
+    $("gW").innerHTML = ""; wPaths = {};
+    if (level === "borough") {
+      var wIds = Object.keys(D.wards).filter(function (w) { return D.wards[w].b === state.borough; });
+      var wc = classes(wIds.map(function (w) { return { id: w, rate: rate(D.wards[w]) }; }));
+      wIds.forEach(function (w) {
+        var p = el("path", { d: D.wards[w].d, "class": "area" });
+        p.dataset.w = w;
+        p.style.fill = colorOf(wc[w]);
+        $("gW").appendChild(p);
+        wPaths[w] = p;
+      });
+    }
+
+    if (zoom) {
+      if (level === "london") zoomTo([0, 0, D.width, D.height]);
+      else if (level === "region") zoomTo(REG[state.region].bbox);
+      else zoomTo(D.boroughs[state.borough].bbox);
+    } else drawOverlay();
+
+    renderCrumbs();
+    renderSide();
+    renderLegend();
+    renderTop();
+  }
+
+  // ── London-wide ward Top N ───────────────────────────────────
+  function topN() {
+    var n = parseInt($("topN").value, 10);
+    return isNaN(n) ? 30 : Math.max(1, Math.min(100, n));
+  }
+  function renderTop() {
+    var all = Object.keys(D.wards).map(function (w) { return { id: w, rate: rate(D.wards[w]) }; })
+      .filter(function (x) { return x.rate != null; })
+      .sort(function (a, b) { return a.rate - b.rate; });
+    var n = Math.min(topN(), all.length);
+    $("topSub").textContent = fmt(L().topSub, { n: all.length, cat: L().cats[state.cat], m: mLbl() });
+    $("topBestH").textContent = fmt(L().topBest, { m: mLbl() });
+    $("topWorstH").textContent = fmt(L().topWorst, { m: mLbl() });
+    function list(items, color, rankOf) {
+      var max = Math.max.apply(null, items.map(function (x) { return x.rate; })) || 1;
+      return items.map(function (x, i) {
+        var w = D.wards[x.id], b = D.boroughs[w.b];
+        return '<button type="button" data-w="' + esc(x.id) + '"' + (state.ward === x.id ? ' class="sel"' : "") + '><span class="no">' + rankOf(i) + '</span>' +
+          '<span class="nm">' + regChip(b.region) + esc(w.name) + "<small>" + esc(bName(b)) + "</small></span>" +
+          '<span class="track"><span class="bar" style="width:' + Math.max(3, x.rate / max * 100) + "%;background:" + color + '"></span></span>' +
+          '<span class="val">' + fmtVal(x.rate) + "</span></button>";
+      }).join("");
+    }
+    $("topBest").innerHTML = list(all.slice(0, n), "var(--c1)", function (i) { return i + 1; });
+    $("topWorst").innerHTML = list(all.slice(-n).reverse(), "var(--c5)", function (i) { return i + 1; });
+  }
+  $("topN").addEventListener("input", renderTop);
+  document.querySelector(".top-n").addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-w]");
+    if (!btn) return;
+    var w = btn.dataset.w, b = D.wards[w].b;
+    go("borough", D.boroughs[b].region, b, w);
+    $("crumbs").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // Labels, markers, highlight — sized to the current zoom
+  function drawOverlay() {
+    var s = scale(), g = $("gLbl");
+    g.innerHTML = "";
+    function label(x, y, txt, px) {
+      var t = el("text", { x: x, y: y, "text-anchor": "middle", "dominant-baseline": "middle", "font-size": px * s, "stroke-width": 3 * s });
+      t.textContent = txt;
+      g.appendChild(t);
+    }
+    if (state.level === "london") {
+      // Region name on a pill in that region's colour
+      REGION_ORDER.forEach(function (k) {
+        var c = labelPoint(k);
+        var t = el("text", { x: c[0], y: c[1], "text-anchor": "middle", "dominant-baseline": "central", "font-size": 13.5 * s, "class": "pill" });
+        t.textContent = L().regions[k];
+        g.appendChild(t);
+        var bb = t.getBBox(), px = 7 * s, py = 3.5 * s;
+        var r = el("rect", { x: bb.x - px, y: bb.y - py, width: bb.width + px * 2, height: bb.height + py * 2, rx: 7 * s,
+          fill: getComputedStyle(document.documentElement).getPropertyValue("--r-" + k).trim(), stroke: "#fff", "stroke-width": 1.5 * s });
+        g.insertBefore(r, t);
+      });
+    } else if (state.level === "region") {
+      D.regions[state.region].forEach(function (code) {
+        var b = D.boroughs[code];
+        label((b.bbox[0] + b.bbox[2]) / 2, (b.bbox[1] + b.bbox[3]) / 2, b.name.replace(/ upon Thames| and /g, function (m) { return m === " and " ? " & " : ""; }), 11.5);
+      });
+    }
+
+    // highlight
+    var hl = $("gHl"); hl.innerHTML = "";
+    var hd = state.level === "borough" && state.ward ? D.wards[state.ward].d : (state.level === "borough" ? D.boroughs[state.borough].d : null);
+    if (hd) hl.appendChild(el("path", { d: hd, "class": "hl" }));
+  }
+  // Nudge label points so they sit inside the region, not in a gap
+  var LABEL_NUDGE = { central: [0.14, 0.12],north: [0, -0.15], east: [0.1, 0], south: [0, 0.18], west: [-0.1, 0] };
+  function labelPoint(k) {
+    var b = REG[k].bbox, n = LABEL_NUDGE[k];
+    return [(b[0] + b[2]) / 2 + n[0] * (b[2] - b[0]), (b[1] + b[3]) / 2 + n[1] * (b[3] - b[1])];
+  }
+
+  function renderCrumbs() {
+    var h = [];
+    if (state.level !== "london") h.push('<button class="back" data-go="up">' + esc(L().back) + "</button>");
+    h.push(state.level === "london" ? '<span class="cur">' + esc(L().london) + "</span>" : '<button data-go="london">' + esc(L().london) + "</button>");
+    if (state.region) {
+      h.push('<span class="sep">›</span>');
+      h.push((state.level === "region" ? '<span class="cur">' + esc(L().regions[state.region]) + "</span>" : '<button data-go="region">' + esc(L().regions[state.region]) + "</button>"));
+    }
+    if (state.level === "borough") {
+      h.push('<span class="sep">›</span><span class="cur">' + esc(bName(D.boroughs[state.borough])) + "</span>");
+    }
+    $("crumbs").innerHTML = h.join("");
+  }
+
+  function statsBlock(o) {
+    var r = per1k(o), yoy = o.prev ? (o.c.all - o.prev) / o.prev * 100 : null;
+    var h = '<div class="stats">' +
+      '<div class="stat"><div class="v">' + (r == null ? "—" : r1(r)) + '</div><div class="k">' + esc(L().rate) + " · " + esc(L().cats[state.cat]) + "</div></div>" +
+      '<div class="stat"><div class="v">' + num(o.c[state.cat]) + '</div><div class="k">' + esc(L().count) + "</div></div>";
+    if (state.cat === "all" && yoy != null) {
+      h += '<div class="stat"><div class="v ' + (yoy > 0 ? "up" : "down") + '">' + (yoy > 0 ? "+" : "") + yoy.toFixed(1) + '%</div><div class="k">' + esc(L().yoy) + "</div></div>";
+    } else {
+      h += '<div class="stat"><div class="v">' + num(o.pop) + '</div><div class="k">' + esc(L().pop) + "</div></div>";
+    }
+    return h + "</div>";
+  }
+
+  function rankList(items, sel) {
+    var cls = classes(items);
+    var sorted = items.slice().sort(function (a, b) {
+      if ((a.rate == null) !== (b.rate == null)) return a.rate == null ? 1 : -1;
+      return a.rate - b.rate;
+    });
+    var max = Math.max.apply(null, items.map(function (it) { return it.rate || 0; })) || 1;
+    var i = 0;
+    return '<div class="rank">' + sorted.map(function (it) {
+      if (it.rate == null) {
+        return '<button type="button" data-id="' + esc(it.id) + '" disabled><span class="no"></span><span class="nm">' + it.label + '</span><span class="nd">' + esc(it.nd || L().noData) + "</span></button>";
+      }
+      i++;
+      return '<button type="button" data-id="' + esc(it.id) + '"' + (sel === it.id ? ' class="sel"' : "") + '><span class="no">' + i + '</span><span class="nm">' + it.label + '</span>' +
+        '<span class="track"><span class="bar" style="width:' + Math.max(3, it.rate / max * 100) + "%;background:" + colorOf(cls[it.id]) + '"></span></span>' +
+        '<span class="val">' + fmtVal(it.rate) + "</span></button>";
+    }).join("") + "</div>";
+  }
+
+  function breakdown(o) {
+    var rows = D.groups.map(function (g, i) { return { g: g, n: o.g[i] }; }).filter(function (x) { return x.n > 0; }).sort(function (a, b) { return b.n - a.n; });
+    var max = rows.length ? rows[0].n : 1;
+    return '<h3>' + esc(L().breakdown) + '</h3><div class="bd">' + rows.map(function (x) {
+      return '<div class="row"><span class="nm" title="' + esc(L().groups[x.g]) + '">' + esc(L().groups[x.g]) + '</span><span class="track"><span class="bar" style="width:' + Math.max(2, x.n / max * 100) + '%"></span></span><span class="n">' + num(x.n) + "</span></div>";
+    }).join("") + "</div>";
+  }
+
+  function renderSide() {
+    var h = "", l = L();
+    if (state.level === "london") {
+      var tot = { c: { all: 0, burglary: 0, violence: 0, robbery: 0 }, prev: 0, pop: 0, g: D.groups.map(function () { return 0; }) };
+      REGION_ORDER.forEach(function (k) {
+        var r = REG[k];
+        D.cats.forEach(function (c) { tot.c[c] += r.c[c]; });
+        tot.prev += r.prev; tot.pop += r.pop;
+        r.g.forEach(function (v, i) { tot.g[i] += v; });
+      });
+      h += "<h2>" + esc(l.london) + "</h2>" + statsBlock(tot);
+      h += "<h3>" + esc(l.rankRegions) + '</h3><p class="hint">' + esc(l.hintRegions) + "</p>";
+      h += rankList(REGION_ORDER.map(function (k) { return { id: k, rate: rate(REG[k]), label: regChip(k, l.regions[k]) }; }));
+    } else if (state.level === "region") {
+      var R = REG[state.region];
+      h += "<h2>" + esc(l.regions[state.region]) + "</h2>" + statsBlock(R);
+      h += "<h3>" + esc(l.rankBoroughs) + '</h3><p class="hint">' + esc(l.hintBoroughs) + "</p>";
+      h += rankList(D.regions[state.region].map(function (c) {
+        var b = D.boroughs[c];
+        return { id: c, rate: rate(b), label: esc(bName(b)) + (bAlt(b) ? "<small>" + esc(bAlt(b)) + "</small>" : ""), nd: b.noData ? l.cityNote : null };
+      }));
+    } else {
+      var B = D.boroughs[state.borough];
+      if (state.ward) {
+        var W = D.wards[state.ward];
+        h += "<h2>" + esc(W.name) + '</h2><p class="alt">' + esc(fmt(l.wardOf, { b: bName(B) })) + "</p>" + statsBlock(W) + breakdown(W);
+      } else {
+        h += "<h2>" + esc(bName(B)) + '</h2><p class="alt">' + esc(bAlt(B)) + "</p>" + statsBlock(B) + breakdown(B);
+      }
+      h += "<h3>" + esc(l.rankWards) + '</h3><p class="hint">' + esc(l.hintWards) + "</p>";
+      h += rankList(Object.keys(D.wards).filter(function (w) { return D.wards[w].b === state.borough; }).map(function (w) {
+        return { id: w, rate: rate(D.wards[w]), label: esc(D.wards[w].name) };
+      }), state.ward);
+    }
+    $("side").innerHTML = h;
+  }
+
+  function renderLegend() {
+    $("legend").innerHTML = esc(fmt(L().legendHead, { m: mLbl() })) + '<div class="sw">' + [1, 2, 3, 4, 5].map(function (i) { return '<span style="background:var(--c' + i + ')"></span>'; }).join("") +
+      '</div><div class="ends"><span>' + esc(L().less) + "</span><span>" + esc(L().more) + "</span></div>";
+  }
+
+  // ── navigation ───────────────────────────────────────────────
+  function go(level, region, borough, ward) {
+    var zoom = level !== state.level || region !== state.region || borough !== state.borough;
+    state.level = level; state.region = region || null; state.borough = borough || null; state.ward = ward || null;
+    hideTip();
+    render(zoom);
+    try { history.replaceState(null, "", "#" + [level, region || "", borough || "", ward || ""].join("/").replace(/\/+$/, "")); } catch (e) {}
+  }
+  function openRegion(k) { go("region", k); }
+  function openBorough(code) {
+    var b = D.boroughs[code];
+    if (!b || b.noData) return;
+    go("borough", b.region, code);
+  }
+  function selectWard(w) {
+    if (state.ward === w) { go("borough", state.region, state.borough); return; }
+    go("borough", state.region, state.borough, w);
+  }
+
+  $("map").addEventListener("click", function (e) {
+    var t = e.target;
+    if (t.dataset.w) { selectWard(t.dataset.w); return; }
+    var code = t.dataset.b;
+    if (!code || D.boroughs[code].noData) return;
+    var b = D.boroughs[code];
+    if (state.level === "london") openRegion(b.region);
+    else if (state.level === "region" && b.region !== state.region) openRegion(b.region);
+    else openBorough(code);
+  });
+  $("side").addEventListener("click", function (e) {
+    var btn = e.target.closest(".rank button[data-id]");
+    if (!btn || btn.disabled) return;
+    var id = btn.dataset.id;
+    if (state.level === "london") openRegion(id);
+    else if (state.level === "region") openBorough(id);
+    else selectWard(id);
+  });
+  $("crumbs").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-go]");
+    if (!b) return;
+    var g = b.dataset.go;
+    if (g === "up") g = state.level === "borough" ? "region" : "london";
+    if (g === "london") go("london");
+    else go("region", state.region);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && state.level !== "london") {
+      if (state.level === "borough") go("region", state.region); else go("london");
+    }
+  });
+
+  // ── tooltip ──────────────────────────────────────────────────
+  function hideTip() { $("tip").hidden = true; }
+  $("map").addEventListener("mousemove", function (e) {
+    var t = e.target, o, name, reg;
+    if (t.dataset.w) { o = D.wards[t.dataset.w]; name = o.name; reg = D.boroughs[o.b].region; }
+    else if (t.dataset.b) {
+      var b = D.boroughs[t.dataset.b];
+      reg = b.region;
+      if (b.noData) { o = b; name = bName(b); }
+      else if (state.level === "london") { o = REG[b.region]; name = L().regions[b.region]; }
+      else { o = b; name = bName(b); }
+    }
+    if (!o) { hideTip(); return; }
+    var r = per1k(o), tip = $("tip"), box = $("mapCard").getBoundingClientRect();
+    tip.innerHTML = regChip(reg) + "<b>" + esc(name) + "</b>" + (r == null ? '<span class="m">' + esc(o.noData ? L().cityNote : L().noData) + "</span>" :
+      esc(fmt(L().tipRate, { r: r1(r) })) + '<br><span class="m">' + esc(fmt(L().tipCount, { n: num(o.c[state.cat]) })) + " · " + esc(L().cats[state.cat]) + "</span>");
+    tip.hidden = false;
+    var x = e.clientX - box.left + 14, y = e.clientY - box.top + 14;
+    if (x + tip.offsetWidth > box.width) x = e.clientX - box.left - tip.offsetWidth - 10;
+    if (y + tip.offsetHeight > box.height) y = e.clientY - box.top - tip.offsetHeight - 10;
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  });
+  $("map").addEventListener("mouseleave", hideTip);
+
+  // ── static text / category ───────────────────────────────────
+  function initText() {
+    document.title = L().doc;
+    document.querySelectorAll("[data-i]").forEach(function (n) { n.textContent = L()[n.dataset.i]; });
+    $("desc").textContent = fmt(L().desc, { from: monthLabel(D.period.from), to: monthLabel(D.period.to), n: D.period.months });
+    $("notes").innerHTML = "<ul>" + L().notes.map(function (s) {
+      return "<li>" + fmt(s, { upd: D.source.crimeUpdated, miss: ((1 - D.wardShare) * 100).toFixed(1) }) + "</li>";
+    }).join("") + "</ul>";
+    $("map").setAttribute("aria-label", L().title);
+    renderCats();
+    render(false);
+  }
+  function renderCats() {
+    $("cat").innerHTML = D.cats.map(function (k) {
+      return '<button type="button" data-v="' + k + '"' + (k === state.cat ? ' class="on"' : "") + ">" + esc(L().cats[k]) + "</button>";
+    }).join("");
+    $("metric").innerHTML = ["rate", "count"].map(function (k) {
+      return '<button type="button" data-v="' + k + '"' + (k === state.metric ? ' class="on"' : "") + ">" + esc(L().metrics[k]) + "</button>";
+    }).join("");
+    $("metricNote").hidden = state.metric !== "count";
+    $("metricNote").textContent = L().metricNote;
+  }
+  $("metric").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    state.metric = b.dataset.v; renderCats(); render(false);
+  });
+  $("cat").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    state.cat = b.dataset.v; renderCats(); render(false);
+  });
+  window.addEventListener("resize", function () { drawOverlay(); });
+
+  // ── init ─────────────────────────────────────────────────────
+  var hash = location.hash.slice(1).split("/");
+  if (hash[0] === "region" && D.regions[hash[1]]) { state.level = "region"; state.region = hash[1]; }
+  if (hash[0] === "borough" && D.boroughs[hash[2]] && !D.boroughs[hash[2]].noData) {
+    state.level = "borough"; state.borough = hash[2]; state.region = D.boroughs[hash[2]].region;
+    if (D.wards[hash[3]] && D.wards[hash[3]].b === hash[2]) state.ward = hash[3];
+  }
+  initText();
+  if (state.level !== "london") render(true);
+})();
+</script>
+</body>
+</html>
