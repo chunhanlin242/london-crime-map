@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Parks with playgrounds in London's safest wards</name>
+    <description>Top 10 parks containing a children's playground, ranked by the ward's recorded crime per 1,000 residents (Met Police, 2026-01 to 2026-08). Park and playground data © OpenStreetMap contributors.</description>
+    <Placemark>
+      <name>1. Cranham Brickfields</name>
+      <description><![CDATA[Ward: Cranham (Havering)<br>Ward crime: 18.0 per 1,000 residents, 234 crimes, 2026-01 to 2026-08<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/56314759]]></description>
+      <Point><coordinates>0.27886,51.56551,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>2. Upminster Hall Playing Fields</name>
+      <description><![CDATA[Ward: Cranham (Havering)<br>Ward crime: 18.0 per 1,000 residents, 234 crimes, 2026-01 to 2026-08<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/18523366]]></description>
+      <Point><coordinates>0.25981,51.56786,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>3. Latchmere Rec</name>
+      <description><![CDATA[Ward: Tudor (Kingston upon Thames)<br>Ward crime: 18.7 per 1,000 residents, 130 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 76 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/4770441]]></description>
+      <Point><coordinates>-0.29471,51.42369,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>4. Kenton Recreation Ground</name>
+      <description><![CDATA[Ward: Kenton West (Harrow)<br>Ward crime: 20.3 per 1,000 residents, 203 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 71 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/11844940]]></description>
+      <Point><coordinates>-0.31914,51.58713,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>5. Priestmead Recreation Ground</name>
+      <description><![CDATA[Ward: Kenton West (Harrow)<br>Ward crime: 20.3 per 1,000 residents, 203 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 68 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/11845199]]></description>
+      <Point><coordinates>-0.31611,51.59553,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>6. Sanderstead Recreation Ground</name>
+      <description><![CDATA[Ward: Sanderstead (Croydon)<br>Ward crime: 21.9 per 1,000 residents, 346 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 75 min<br>Playgrounds in park (OpenStreetMap): 2 — equipment: structure, aerialrotator, basketswing, climbingframe<br>https://www.openstreetmap.org/way/259393673]]></description>
+      <Point><coordinates>-0.07816,51.33251,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>7. Moorhall Recreation Ground</name>
+      <description><![CDATA[Ward: Ickenham & South Harefield (Hillingdon)<br>Ward crime: 22.6 per 1,000 residents, 351 crimes, 2026-01 to 2026-08<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/28968606]]></description>
+      <Point><coordinates>-0.48332,51.5893,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>8. Swakeleys Park</name>
+      <description><![CDATA[Ward: Ickenham & South Harefield (Hillingdon)<br>Ward crime: 22.6 per 1,000 residents, 351 crimes, 2026-01 to 2026-08<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/39658344]]></description>
+      <Point><coordinates>-0.45457,51.56118,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>9. Stevens Park</name>
+      <description><![CDATA[Ward: West Heath (Bexley)<br>Ward crime: 23.0 per 1,000 residents, 367 crimes, 2026-01 to 2026-08<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/681603151]]></description>
+      <Point><coordinates>0.1214,51.47034,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>10. Centenary Park</name>
+      <description><![CDATA[Ward: Centenary (Harrow)<br>Ward crime: 23.2 per 1,000 residents, 353 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 74 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/9545952]]></description>
+      <Point><coordinates>-0.30264,51.5981,0</coordinates></Point>
+    </Placemark>
+  </Document>
+</kml>

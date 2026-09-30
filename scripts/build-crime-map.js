@@ -17,7 +17,8 @@ const OUT = path.join(__dirname, "..", "data", "crime-map-data.js");
 const DATASET_API = "https://data.london.gov.uk/api/dataset/recorded_crime_summary";
 const ONS = "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/";
 const WHERE_LONDON = encodeURIComponent("LAD22CD LIKE 'E09%'");
-const POP_URL = "https://www.nomisweb.co.uk/api/v01/dataset/NM_2021_1.data.csv?date=latest&geography=TYPE153&c2021_restype_3=0&measures=20100&select=geography_code,obs_value";
+const POP_EST_URL = "https://www.nomisweb.co.uk/api/v01/dataset/NM_2014_1.data.csv?date=latest&geography=TYPE153&gender=0&c_age=200&measures=20100&select=date_name,geography_code,obs_value";
+const POP_URL ="https://www.nomisweb.co.uk/api/v01/dataset/NM_2021_1.data.csv?date=latest&geography=TYPE153&c2021_restype_3=0&measures=20100&select=geography_code,obs_value";
 
 // London Plan (2016) sub-regions
 const REGIONS = {
@@ -122,6 +123,10 @@ function toPath(geom, proj) {
   // 2. Population + boundaries
   const popText = await get(POP_URL);
   const pop = new Map(parseCsv(popText).slice(1).map(r => [r[0], +r[1]]));
+  // Latest mid-year estimate (2021-based) — only used to flag wards that have grown fast since the Census
+  const estRows = parseCsv(await get(POP_EST_URL)).slice(1);
+  const popEst = new Map(estRows.map(r => [r[1], +r[2]]));
+  const estYear = estRows.length ? estRows[0][0] : null;
   const wardsGj = await get(ONS + "Wards_December_2022_Boundaries_UK_BGC/FeatureServer/0/query?where=" + WHERE_LONDON +
     "&outFields=WD22CD,WD22NM,LAD22CD,LAD22NM&outSR=4326&geometryPrecision=5&maxAllowableOffset=0.0002&f=geojson", "json");
   const ladsGj = await get(ONS + "Local_Authority_Districts_December_2022_UK_BGC_V2/FeatureServer/0/query?where=" + WHERE_LONDON +
@@ -149,7 +154,7 @@ function toPath(geom, proj) {
   wardsGj.features.forEach(f => {
     const p = f.properties;
     const pth = toPath(f.geometry, proj);
-    wards[p.WD22CD] = Object.assign(blank(), { name: p.WD22NM, b: p.LAD22CD, pop: pop.get(p.WD22CD) || 0, d: pth.d, bbox: pth.bbox });
+    wards[p.WD22CD] = Object.assign(blank(), { name: p.WD22NM, b: p.LAD22CD, pop: pop.get(p.WD22CD) || 0, popEst: popEst.get(p.WD22CD) || 0, d: pth.d, bbox: pth.bbox });
     boroughs[p.LAD22CD].pop += pop.get(p.WD22CD) || 0;
   });
 
@@ -201,6 +206,7 @@ function toPath(geom, proj) {
 
   const out = {
     built: new Date().toISOString().slice(0, 10),
+    popEstYear: estYear,
     period: { from: head[ytd[0]].replace(/(\d{4})(\d\d)/, "$1-$2"), to: lastMonth.replace(/(\d{4})(\d\d)/, "$1-$2"), months: ytd.length },
     source: { crimeUpdated: String(bRes.check_timestamp).slice(0, 10) },
     wardShare: +(wardSum / boroughSum).toFixed(3),

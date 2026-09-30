@@ -7,6 +7,10 @@ sub-regions (Central, North, East, South, West), click into a borough, then into
 - Filter by crime type: all crime, residential burglary, violence & sexual offences,
   robbery & theft from the person
 - London-wide ward league table: the safest and the highest-crime wards, top N
+- One fixed colour scale for the whole map, so a good ward inside a high-crime borough still shows green
+- Parks with a children's playground (OpenStreetMap), with public-transport time from Imperial College
+  South Kensington (TfL Journey Planner) and a filter for wards within 40 or 60 minutes
+- Flags for wards with few residents or fast population growth since the 2021 Census
 
 No build step and no dependencies — it's one HTML file plus a generated data file.
 
@@ -32,7 +36,12 @@ node scripts/build-crime-map.js
 ```
 
 The script downloads the latest files, uses every month of the most recent year in them,
-and prints a few consistency checks.
+and prints a few consistency checks. Then rebuild the park data (reuses previous TfL times,
+so only new parks are queried):
+
+```bash
+node scripts/build-parks.js
+```
 
 ## Data sources
 
@@ -41,6 +50,9 @@ and prints a few consistency checks.
 | Recorded crime by borough and ward | Metropolitan Police Service, [London Datastore](https://data.london.gov.uk/dataset/recorded_crime_summary) |
 | Population by ward | 2021 Census TS001, [Nomis](https://www.nomisweb.co.uk/) |
 | Ward and borough boundaries (Dec 2022) | [ONS Open Geography Portal](https://geoportal.statistics.gov.uk/) |
+| Ward population estimates (mid-year, 2021-based) | [Nomis](https://www.nomisweb.co.uk/) |
+| Parks, playgrounds, play equipment | © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), via Overpass API |
+| Journey times from Imperial | [TfL Journey Planner](https://api.tfl.gov.uk/) — powered by TfL Open Data |
 
 Contains Metropolitan Police Service data and Office for National Statistics data licensed
 under the [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).

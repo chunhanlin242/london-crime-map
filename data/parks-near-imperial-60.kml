@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Parks with playgrounds within 60 min of Imperial</name>
+    <description>Parks containing a children's playground within about 60 minutes by public transport from Imperial College South Kensington (TfL Journey Planner, weekday 10:00), ranked by the ward's recorded crime per 1,000 residents (Met Police, 2026-01 to 2026-08). Park and playground data © OpenStreetMap contributors.</description>
+    <Placemark>
+      <name>1. Cottenham Park</name>
+      <description><![CDATA[Ward: Village (Merton)<br>Ward crime: 24.1 per 1,000 residents, 285 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 57 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/5228085]]></description>
+      <Point><coordinates>-0.23688,51.41375,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>2. Bridgwater Road Fields</name>
+      <description><![CDATA[Ward: Ruislip Manor (Hillingdon)<br>Ward crime: 25.7 per 1,000 residents, 282 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 60 min<br>Playgrounds in park (OpenStreetMap): 2<br>https://www.openstreetmap.org/way/23567194]]></description>
+      <Point><coordinates>-0.40711,51.56221,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>3. Wendell Park</name>
+      <description><![CDATA[Ward: Wendell Park (Hammersmith and Fulham)<br>Ward crime: 27.2 per 1,000 residents, 202 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 44 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/165236259]]></description>
+      <Point><coordinates>-0.24807,51.50244,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>4. Whitelands Park</name>
+      <description><![CDATA[Ward: West Hill (Wandsworth)<br>Ward crime: 29.0 per 1,000 residents, 488 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 44 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/1090859398]]></description>
+      <Point><coordinates>-0.20969,51.45068,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>5. Blondin Park</name>
+      <description><![CDATA[Ward: Northfield (Ealing)<br>Ward crime: 29.1 per 1,000 residents, 415 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 47 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/23152759]]></description>
+      <Point><coordinates>-0.31794,51.49582,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>6. Coronation Gardens</name>
+      <description><![CDATA[Ward: Southfields (Wandsworth)<br>Ward crime: 30.1 per 1,000 residents, 381 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 41 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/185966882]]></description>
+      <Point><coordinates>-0.20021,51.44646,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>7. Churchfields Recreation Ground</name>
+      <description><![CDATA[Ward: Clock House (Bromley)<br>Ward crime: 33.1 per 1,000 residents, 574 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 60 min<br>Playgrounds in park (OpenStreetMap): 1 — equipment: climbingframe, structure, spinning_circle, basketswing, basketrotator, zipwire<br>https://www.openstreetmap.org/way/27273406]]></description>
+      <Point><coordinates>-0.04538,51.40511,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>8. Butlers Green</name>
+      <description><![CDATA[Ward: Sudbury (Brent)<br>Ward crime: 33.5 per 1,000 residents, 467 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 57 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/4874264]]></description>
+      <Point><coordinates>-0.31798,51.55656,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>9. Maybank Open Space</name>
+      <description><![CDATA[Ward: Sudbury (Brent)<br>Ward crime: 33.5 per 1,000 residents, 467 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 60 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/4392792]]></description>
+      <Point><coordinates>-0.3217,51.55436,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>10. Ridding Lane Open Space</name>
+      <description><![CDATA[Ward: North Greenford (Ealing)<br>Ward crime: 34.2 per 1,000 residents, 532 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 56 min<br>Playgrounds in park (OpenStreetMap): 1 — equipment: climbingframe, climbingwall, structure<br>https://www.openstreetmap.org/way/4392726]]></description>
+      <Point><coordinates>-0.33237,51.55542,0</coordinates></Point>
+    </Placemark>
+  </Document>
+</kml>

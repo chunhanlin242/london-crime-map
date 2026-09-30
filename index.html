@@ -61,15 +61,17 @@ h1 { font-size:26px; font-weight:700; letter-spacing:-.02em; margin:2px 0 6px; }
 #map path.area:hover { filter:brightness(1.08) saturate(1.1); }
 #map path.area.off { fill:var(--map-off); }
 #map path.area.nodata { fill:var(--map-nodata); cursor:default; }
-#map text.pill { fill:#fff; stroke:none; }
 #map path.hl { fill:none; stroke:var(--ink); stroke-width:2.2; vector-effect:non-scaling-stroke; pointer-events:none; }
 #map path.region-line { fill:none; stroke:var(--map-stroke); stroke-width:2.6; vector-effect:non-scaling-stroke; pointer-events:none; }
 #map text { pointer-events:none; font-family:var(--font); paint-order:stroke; stroke:rgba(255,255,255,.85); stroke-linejoin:round; fill:#1d1d1f; font-weight:700; }
+#map text.pill { fill:#fff; stroke:none; }
+#map text.pill { fill:#fff; stroke:none; }
 .legend { position:absolute; left:12px; bottom:12px; background:color-mix(in srgb, var(--surface) 88%, transparent); border-radius:10px; padding:8px 10px; font-size:11px; color:var(--muted); box-shadow:0 1px 4px rgba(0,0,0,.08); }
 .legend .sw { display:flex; margin:4px 0 2px; }
 .legend .sw span { width:26px; height:9px; }
 .legend .sw span:first-child { border-radius:5px 0 0 5px; } .legend .sw span:last-child { border-radius:0 5px 5px 0; }
 .legend .ends { display:flex; justify-content:space-between; }
+.legend .cuts { display:flex; justify-content:space-between; font-variant-numeric:tabular-nums; gap:6px; }
 .tip { position:absolute; pointer-events:none; background:var(--surface); color:var(--ink); border-radius:10px; padding:8px 11px; font-size:12px; box-shadow:0 6px 20px rgba(0,0,0,.15); max-width:240px; z-index:5; }
 .tip b { display:block; font-size:13px; }
 .tip .m { color:var(--muted); }
@@ -118,6 +120,25 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
 .top-n-cols { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
 .top-n h3.good { color:var(--green-ink); } .top-n h3.bad { color:var(--red); }
 .top-n .rank button { grid-template-columns:26px minmax(0,1fr) 70px 48px; }
+.flag { display:inline-block; font-size:10.5px; font-weight:700; color:#8a5a00; background:#fff3e2; border-radius:5px; padding:0 5px; margin-left:6px; vertical-align:1px; white-space:nowrap; }
+.flag.t { color:var(--blue); background:var(--blue-soft); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .flag { color:#ffb340; background:#33240a; } }
+.pk { display:inline-block; font-size:10.5px; font-weight:700; color:#1f7a3a; background:#e3f5e8; border-radius:5px; padding:0 5px; margin-left:6px; vertical-align:1px; white-space:nowrap; }
+.parks { display:flex; flex-direction:column; gap:6px; }
+.parks a { display:flex; justify-content:space-between; gap:8px; align-items:baseline; font-size:13px; text-decoration:none; color:var(--ink); padding:6px 8px; border-radius:8px; background:var(--soft); }
+.parks a:hover { background:var(--soft-2); }
+.parks a small { color:var(--muted); font-size:11.5px; white-space:nowrap; }
+.park-top { margin-top:16px; background:var(--surface); border:1px solid var(--line-soft); border-radius:var(--radius-lg); padding:18px; }
+.park-top h2 { font-size:19px; font-weight:700; letter-spacing:-.01em; }
+.park-top .alt { color:var(--muted); font-size:12.5px; }
+.park-top .table-wrap { overflow-x:auto; }
+.park-top table { width:100%; min-width:560px; border-collapse:collapse; font-size:13px; margin-top:12px; }
+.park-top th { text-align:left; font-size:11px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.05em; padding:8px; border-bottom:1px solid var(--line-soft); white-space:nowrap; }
+.park-top td { padding:9px 8px; border-bottom:1px solid var(--line-soft); vertical-align:top; }
+.park-top td.n { text-align:right; font-weight:600; font-variant-numeric:tabular-nums; }
+.park-top td small { display:block; color:var(--muted); font-size:11.5px; }
+.park-top .dl { display:inline-block; margin-top:12px; font-size:13px; font-weight:600; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pk { color:#30d158; background:#0f2e18; } }
 .notes { margin-top:16px; font-size:12.5px; color:var(--muted); line-height:1.7; background:var(--surface); border:1px solid var(--line-soft); border-radius:var(--radius); padding:14px 18px; }
 .credit { margin-top:10px; font-size:11.5px; color:var(--muted-2); line-height:1.6; }
 .notes li { margin-left:18px; }
@@ -148,6 +169,8 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
   <div class="controls">
     <span class="lbl" data-i="catLbl"></span>
     <div class="seg" id="cat" role="group"></div>
+    <span class="lbl" data-i="scopeLbl"></span>
+    <div class="seg" id="scope" role="group"></div>
     <span class="lbl" data-i="metricLbl"></span>
     <div class="seg" id="metric" role="group"></div>
   </div>
@@ -183,11 +206,22 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
     </div>
   </section>
 
+  <section class="park-top" id="parkTop" hidden>
+    <div class="top-n-head">
+      <h2 data-i="parkTitle"></h2>
+      <div class="seg" id="parkScope" role="group"></div>
+    </div>
+    <p class="alt" id="parkSub"></p>
+    <div class="table-wrap"><table id="parkTable"></table></div>
+    <a class="dl" id="parkDl" href="data/parks-near-imperial.kml" download></a>
+  </section>
+
   <div class="notes" id="notes"></div>
-  <p class="credit">Contains Metropolitan Police Service data (<a href="https://data.london.gov.uk/dataset/recorded_crime_summary">London Datastore</a>) and Office for National Statistics data (<a href="https://www.nomisweb.co.uk/">Census 2021</a>, <a href="https://geoportal.statistics.gov.uk/">ONS Open Geography Portal</a>), licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a>. Contains OS data © Crown copyright and database right 2022. Not an official product of any of these bodies.</p>
+  <p class="credit">Contains Metropolitan Police Service data (<a href="https://data.london.gov.uk/dataset/recorded_crime_summary">London Datastore</a>) and Office for National Statistics data (<a href="https://www.nomisweb.co.uk/">Census 2021 and mid-year estimates</a>, <a href="https://geoportal.statistics.gov.uk/">ONS Open Geography Portal</a>), licensed under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a>. Contains OS data © Crown copyright and database right 2022. Park and playground data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>. Journey times powered by TfL Open Data. Not an official product of any of these bodies.</p>
 </div>
 
 <script src="data/crime-map-data.js"></script>
+<script src="data/parks-data.js"></script>
 <script>
 (function () {
   "use strict";
@@ -209,14 +243,30 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
       hintRegions: "Click the map or the list to open a sub-region.", hintBoroughs: "Click a borough to see its wards.", hintWards: "Click a ward to see what kinds of crime it has.",
       breakdown: "Crime mix", noData: "No data",
       cityNote: "Policed by the City of London Police, not included in this data",
-            topTitle: "Ward rankings across London",
+      topTitle: "Ward rankings across London",
       topSub: "All {n} London wards ranked by \"{m} · {cat}\". Click a row to open that ward on the map.",
       topShow: "Show top", topUnit: "",
       topBest: "Safest (lowest {m})", topWorst: "Most crime (highest {m})",
+      scopeLbl: "Area", scopes: { all: "All London", "40": "Within 40 min of Imperial", "60": "Within 60 min of Imperial" },
+      topSubNear: "{n} wards with a playground park within {t} minutes of Imperial by public transport (TfL, weekday 10:00), ranked by \"{m} · {cat}\". The time shown is to the ward's nearest such park. Colour cut-points are recalculated from these wards.",
+      outScope: "no park within {t} min",
+      popSmall: "few residents", popSmallTip: "Only {n} residents in the 2021 Census — a few crimes or a busy high street can push the rate up",
+      popGrow: "pop +{g}%", popGrowTip: "{a} residents in the 2021 Census, {b} estimated in {y}. Rates use 2021, so they may be overstated",
       metricLbl: "Rank by",
       metrics: { rate: "crimes per 1,000", count: "total crimes" },
       metricNote: "Total crimes aren't adjusted for population: bigger, busier places always have more (East London has 10 boroughs, North London only 3). To compare how safe places are, use crimes per 1,000 residents.",
-      legendHead: "{m} (vs. same level)", less: "Lower", more: "Higher",
+      parkTag: "Parks: {n}", parkTagTip: "{n} park(s) in this ward with a children's playground",
+      parkHead: "Parks with a children's playground",
+      parkOlder: "equipment for older kids", parkAny: "children's playground",
+      parkTitle: "Parks with a playground, safest first",
+      parkScopes: { "30": "Within 30 min of Imperial", "40": "Within 40 min of Imperial", "60": "Within 60 min of Imperial", all: "All London (top 10)" },
+      parkSub: "Ranked by the ward's \"{m} · {cat}\". {n} parks with a children's playground across London. \"Equipment for older kids\" means OpenStreetMap lists climbing frames, zip wires or similar; untagged doesn't mean absent.",
+      parkSubNear: "{n} parks within about {t} minutes of Imperial South Kensington by public transport (TfL Journey Planner, weekday 10:00), ranked by the ward's \"{m} · {cat}\".",
+      parkCol: "Park", wardCol: "Ward", timeCol: "From Imperial", rankCol: "London ward rank",
+      minutes: "{t} min",
+      parkDl: "Download KML for Google My Maps (all London, all crime per 1,000) ↓",
+      parkDlNear: "Download KML for Google My Maps (top 10 within {t} min of Imperial, all crime per 1,000) ↓",
+      legendHead: "{m} (fixed London-wide scale)", legendHeadNear: "{m} (fixed scale, wards within {t} min)", legendHeadCount: "{m} (vs. all London {lvl})", levels: { region: "sub-regions", borough: "boroughs", ward: "wards" }, less: "Lower", more: "Higher",
       tipRate: "{r} per 1,000", tipCount: "{n} crimes",
       wardOf: "Wards of {b}",
       groups: {
@@ -226,17 +276,17 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
         "THEFT": "Theft (incl. shoplifting, pickpocketing)", "VEHICLE OFFENCES": "Vehicle offences", "VIOLENCE AGAINST THE PERSON": "Violence against the person"
       },
       notes: [
-        "<strong>Sources:</strong> Met Police borough- and ward-level recorded crime (London Datastore, updated {upd}); population from the 2021 Census.",
+        "<strong>Sources:</strong> Met Police borough- and ward-level recorded crime (London Datastore, updated {upd}); population from the 2021 Census. Parks and playgrounds from OpenStreetMap (volunteer-mapped, may be incomplete).",
         "<strong>Why per 1,000 residents:</strong> busier places always have more crime, so counts are divided by population. But population means people who live there — commuters and tourists aren't counted — so <strong>Westminster, the areas around the City and Soho will always look high</strong>. That doesn't mean their residential streets are unusually unsafe.",
         "<strong>For \"is it safe to live here\", switch to Residential burglary</strong> — it only counts break-ins at homes and isn't skewed by shops or visitors.",
-        "<strong>Colours compare like with like:</strong> sub-regions against each other, boroughs within a sub-region, wards within a borough — each split into 5 bands. The same shade of green means different numbers at different levels.",
+        "<strong>Colours use one fixed London-wide scale:</strong> for crimes per 1,000, the five bands are cut at the quintiles of all London wards and the same cut-points apply at every level, so a good ward inside a high-crime borough still shows green. For total crimes, each level is compared with all London units at that level (totals can't be compared across levels), but the scale still doesn't change when you drill in.",
         "About {miss}% of crimes aren't assigned to a ward, so they count towards borough totals only; ward totals add up to slightly less.",
         "Sub-regions follow the Mayor of London's London Plan (2016). The City of London is policed by the City of London Police and isn't in this data."
       ]
     }
   };
 
-  var state = { cat: "all", metric: "rate", level: "london", region: null, borough: null, ward: null, vb: [0, 0, D.width, D.height] };
+  var state = { lang: "zh", cat: "all", metric: "rate", scope: "all", level: "london", region: null, borough: null, ward: null, vb: [0, 0, D.width, D.height] };
 
   // ── helpers ──────────────────────────────────────────────────
   function $(id) { return document.getElementById(id); }
@@ -276,11 +326,47 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
   function fmtVal(v) { return state.metric === "count" ? num(v) : r1(v); }
   function mLbl() { return L().metrics[state.metric]; }
 
-  // Assign each item a 1–5 class by rank among its siblings
-  function classes(items) {
-    var ok = items.filter(function (it) { return it.rate != null; }).sort(function (a, b) { return a.rate - b.rate; });
-    var n = ok.length, map = {};
-    ok.forEach(function (it, i) { map[it.id] = n < 2 ? 1 : Math.min(5, 1 + Math.floor(i / n * 5)); });
+  // Fixed colour scale — the same numbers get the same colour wherever you are on the map.
+  // Per 1,000 residents: one scale for every level, cut at the quintiles of all London wards.
+  // Total crimes can't be compared across levels, so each level is cut at the quintiles of
+  // all London units at that level (regions / boroughs / wards) — still fixed when you drill in.
+  var TH = {};
+  function levelValues(level) {
+    var src = level === "ward" ? D.wards : level === "borough" ? D.boroughs : REG;
+    return Object.keys(src).filter(function (k) { return level !== "ward" || inScope(k); }).map(function (k) { return rate(src[k]); }).filter(function (v) { return v != null; }).sort(function (a, b) { return a - b; });
+  }
+  function scaleOf(level) {
+    var key = state.cat + "|" + state.metric + "|" + state.scope + "|" + (state.metric === "rate" ? "ward" : level);
+    if (!TH[key]) {
+      var v = levelValues(state.metric === "rate" ? "ward" : level), q = function (p) { return v[Math.min(v.length - 1, Math.floor(p * v.length))]; };
+      TH[key] = { cuts: [q(0.2), q(0.4), q(0.6), q(0.8)], cap: q(0.95) };
+    }
+    return TH[key];
+  }
+  // "Within 60 min of Imperial" scope: a ward is in scope when one of its playground parks is
+  // reachable within 60 min (TfL times computed by build-parks.js). WT = fastest park per ward.
+  var WT = {};
+  Object.keys((window.PARKS && window.PARKS.wards) || {}).forEach(function (w) {
+    window.PARKS.wards[w].forEach(function (p) { if (p.t && (WT[w] == null || p.t < WT[w])) WT[w] = p.t; });
+  });
+  function inScope(w) { return state.scope === "all" || (WT[w] != null && WT[w] <= +state.scope); }
+  // Population flags: few residents, or fast growth since the 2021 Census (denominator likely too small)
+  function popTag(w) {
+    var W = D.wards[w], h = "";
+    if (!W || !W.pop) return "";
+    if (W.pop < 7000) h += '<span class="flag" title="' + esc(fmt(L().popSmallTip, { n: num(W.pop) })) + '">' + esc(L().popSmall) + "</span>";
+    if (W.popEst && W.popEst / W.pop > 1.15) {
+      var g = Math.round((W.popEst / W.pop - 1) * 100);
+      h += '<span class="flag" title="' + esc(fmt(L().popGrowTip, { a: num(W.pop), b: num(W.popEst), y: D.popEstYear })) + '">' + esc(fmt(L().popGrow, { g: g })) + "</span>";
+    }
+    return h;
+  }
+  function levelOfItems() { return state.level === "london" ? "region" : state.level === "region" ? "borough" : "ward"; }
+  function classes(items, level) {
+    var cuts = scaleOf(level || levelOfItems()).cuts, map = {};
+    items.forEach(function (it) {
+      if (it.rate != null) map[it.id] = 1 + cuts.filter(function (c) { return it.rate > c; }).length;
+    });
     return map;
   }
 
@@ -335,7 +421,7 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
 
     // Borough layer fills
     if (level === "london") {
-      var rc = classes(REGION_ORDER.map(function (k) { return { id: k, rate: rate(REG[k]) }; }));
+      var rc = classes(REGION_ORDER.map(function (k) { return { id: k, rate: rate(REG[k]) }; }), "region");
       Object.keys(bPaths).forEach(function (code) {
         var b = D.boroughs[code], p = bPaths[code];
         p.classList.remove("off");
@@ -343,7 +429,7 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
       });
     } else if (level === "region") {
       var ids = D.regions[state.region];
-      var bc = classes(ids.map(function (c) { return { id: c, rate: rate(D.boroughs[c]) }; }));
+      var bc = classes(ids.map(function (c) { return { id: c, rate: rate(D.boroughs[c]) }; }), "borough");
       Object.keys(bPaths).forEach(function (code) {
         var b = D.boroughs[code], p = bPaths[code], inside = b.region === state.region;
         p.classList.toggle("off", !inside && !b.noData);
@@ -362,11 +448,11 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
     $("gW").innerHTML = ""; wPaths = {};
     if (level === "borough") {
       var wIds = Object.keys(D.wards).filter(function (w) { return D.wards[w].b === state.borough; });
-      var wc = classes(wIds.map(function (w) { return { id: w, rate: rate(D.wards[w]) }; }));
+      var wc = classes(wIds.filter(inScope).map(function (w) { return { id: w, rate: rate(D.wards[w]) }; }), "ward");
       wIds.forEach(function (w) {
         var p = el("path", { d: D.wards[w].d, "class": "area" });
         p.dataset.w = w;
-        p.style.fill = colorOf(wc[w]);
+        if (inScope(w)) p.style.fill = colorOf(wc[w]); else p.classList.add("off");
         $("gW").appendChild(p);
         wPaths[w] = p;
       });
@@ -382,6 +468,7 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
     renderSide();
     renderLegend();
     renderTop();
+    renderParkTop();
   }
 
   // ── London-wide ward Top N ───────────────────────────────────
@@ -389,12 +476,83 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
     var n = parseInt($("topN").value, 10);
     return isNaN(n) ? 30 : Math.max(1, Math.min(100, n));
   }
+  // ── Parks with a children's playground (OpenStreetMap) ───────
+  var PK = (window.PARKS && window.PARKS.wards) || {};
+  function mapsUrl(p, w) {
+    return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(p.n + ", " + D.boroughs[D.wards[w].b].name + ", London");
+  }
+  function nearestMin(w) {
+    var ts = (PK[w] || []).map(function (p) { return p.t; }).filter(function (t) { return t && t <= 60; });
+    return ts.length ? Math.min.apply(null, ts) : null;
+  }
+  function parkTag(w) {
+    var n = (PK[w] || []).length;
+    if (!n) return "";
+    var t = nearestMin(w);
+    return '<span class="pk" title="' + esc(fmt(L().parkTagTip, { n: n })) + '">' + esc(fmt(L().parkTag, { n: n })) +
+      (t ? " · " + esc(fmt(L().minutes, { t: t })) : "") + "</span>";
+  }
+  function parkList(w) {
+    var ps = PK[w] || [];
+    if (!ps.length) return "";
+    return "<h3>" + esc(L().parkHead) + '</h3><div class="parks">' + ps.map(function (p) {
+      return '<a href="' + esc(mapsUrl(p, w)) + '" target="_blank" rel="noreferrer"><span>' + esc(p.n) + "</span><small>" +
+        esc(p.older ? L().parkOlder : L().parkAny) + " · Google Maps ↗</small></a>";
+    }).join("") + "</div>";
+  }
+  var parkScope = "30"; // "30" / "60" = within that many minutes of Imperial, "all" = all London
+  function renderParkTop() {
+    var rows = [], total = 0, near = parkScope !== "all", limit = +parkScope;
+    Object.keys(PK).forEach(function (w) {
+      var r = rate(D.wards[w]);
+      PK[w].forEach(function (p) {
+        if (near && !(p.t && p.t <= limit)) return;
+        if (!inScope(w)) return;
+        total++;
+        if (r != null) rows.push({ p: p, w: w, r: r });
+      });
+    });
+    if (!Object.keys(PK).length) return;
+    rows.sort(function (a, b) { return a.r - b.r || a.p.n.localeCompare(b.p.n); });
+    if (!near) rows = rows.slice(0, 10); // near school: list every park, not just the top 10
+    var rankOf = {};
+    if (near) {
+      var ids = Object.keys(D.wards).filter(function (k) { return inScope(k) && rate(D.wards[k]) != null; })
+        .sort(function (a, b) { return rate(D.wards[a]) - rate(D.wards[b]); });
+      ids.forEach(function (k, i) { rankOf[k] = i + 1; });
+      var nWards = ids.length;
+    }
+    $("parkTop").hidden = false;
+    $("parkScope").innerHTML = ["30", "40", "60", "all"].map(function (k) {
+      return '<button type="button" data-v="' + k + '"' + (k === parkScope ? ' class="on"' : "") + ">" + esc(L().parkScopes[k]) + "</button>";
+    }).join("");
+    $("parkSub").textContent = fmt(L()[near ? "parkSubNear" : "parkSub"], { m: mLbl(), cat: L().cats[state.cat], n: total, t: limit });
+    var dl = $("parkDl");
+    dl.href = !near ? "data/parks-top10.kml" : limit === 30 ? "data/parks-near-imperial.kml" : "data/parks-near-imperial-" + limit + ".kml";
+    dl.textContent = fmt(L()[near ? "parkDlNear" : "parkDl"], { t: limit });
+    $("parkTable").innerHTML = "<thead><tr><th>#</th><th>" + esc(L().parkCol) + "</th><th>" + esc(L().wardCol) + "</th><th>" + esc(mLbl()) + "</th>" +
+      (near ? "<th>" + esc(L().rankCol) + "</th><th>" + esc(L().timeCol) + "</th>" : "") + "<th></th></tr></thead><tbody>" +
+      rows.map(function (x, i) {
+        var W = D.wards[x.w], B = D.boroughs[W.b];
+        return "<tr><td>" + (i + 1) + "</td><td><b>" + esc(x.p.n) + "</b><small>" + esc(x.p.older ? L().parkOlder : L().parkAny) + "</small></td>" +
+          "<td>" + regChip(B.region) + esc(W.name) + "<small>" + esc(bName(B)) + "</small></td>" +
+          '<td class="n">' + fmtVal(x.r) + "</td>" +
+          (near ? '<td class="n">' + rankOf[x.w] + ' <small style="display:inline">/ ' + nWards + "</small></td>" +
+            '<td class="n">' + esc(fmt(L().minutes, { t: x.p.t })) + "</td>" : "") +
+          '<td><a href="' + esc(mapsUrl(x.p, x.w)) + '" target="_blank" rel="noreferrer">Google Maps ↗</a></td></tr>';
+      }).join("") + "</tbody>";
+  }
+  $("parkScope").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    parkScope = b.dataset.v; renderParkTop();
+  });
+
   function renderTop() {
-    var all = Object.keys(D.wards).map(function (w) { return { id: w, rate: rate(D.wards[w]) }; })
+    var all = Object.keys(D.wards).filter(inScope).map(function (w) { return { id: w, rate: rate(D.wards[w]) }; })
       .filter(function (x) { return x.rate != null; })
       .sort(function (a, b) { return a.rate - b.rate; });
     var n = Math.min(topN(), all.length);
-    $("topSub").textContent = fmt(L().topSub, { n: all.length, cat: L().cats[state.cat], m: mLbl() });
+    $("topSub").textContent = fmt(L()[state.scope !== "all" ? "topSubNear" : "topSub"], { n: all.length, cat: L().cats[state.cat], m: mLbl(), t: state.scope });
     $("topBestH").textContent = fmt(L().topBest, { m: mLbl() });
     $("topWorstH").textContent = fmt(L().topWorst, { m: mLbl() });
     function list(items, color, rankOf) {
@@ -402,7 +560,7 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
       return items.map(function (x, i) {
         var w = D.wards[x.id], b = D.boroughs[w.b];
         return '<button type="button" data-w="' + esc(x.id) + '"' + (state.ward === x.id ? ' class="sel"' : "") + '><span class="no">' + rankOf(i) + '</span>' +
-          '<span class="nm">' + regChip(b.region) + esc(w.name) + "<small>" + esc(bName(b)) + "</small></span>" +
+          '<span class="nm">' + regChip(b.region) + esc(w.name) + parkTag(x.id) + popTag(x.id) + "<small>" + esc(bName(b)) + "</small></span>" +
           '<span class="track"><span class="bar" style="width:' + Math.max(3, x.rate / max * 100) + "%;background:" + color + '"></span></span>' +
           '<span class="val">' + fmtVal(x.rate) + "</span></button>";
       }).join("");
@@ -451,6 +609,7 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
     var hl = $("gHl"); hl.innerHTML = "";
     var hd = state.level === "borough" && state.ward ? D.wards[state.ward].d : (state.level === "borough" ? D.boroughs[state.borough].d : null);
     if (hd) hl.appendChild(el("path", { d: hd, "class": "hl" }));
+
   }
   // Nudge label points so they sit inside the region, not in a gap
   var LABEL_NUDGE = { central: [0.14, 0.12],north: [0, -0.15], east: [0.1, 0], south: [0, 0.18], west: [-0.1, 0] };
@@ -487,12 +646,11 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
   }
 
   function rankList(items, sel) {
-    var cls = classes(items);
+    var cls = classes(items), cap = scaleOf(levelOfItems()).cap;
     var sorted = items.slice().sort(function (a, b) {
       if ((a.rate == null) !== (b.rate == null)) return a.rate == null ? 1 : -1;
       return a.rate - b.rate;
     });
-    var max = Math.max.apply(null, items.map(function (it) { return it.rate || 0; })) || 1;
     var i = 0;
     return '<div class="rank">' + sorted.map(function (it) {
       if (it.rate == null) {
@@ -500,7 +658,7 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
       }
       i++;
       return '<button type="button" data-id="' + esc(it.id) + '"' + (sel === it.id ? ' class="sel"' : "") + '><span class="no">' + i + '</span><span class="nm">' + it.label + '</span>' +
-        '<span class="track"><span class="bar" style="width:' + Math.max(3, it.rate / max * 100) + "%;background:" + colorOf(cls[it.id]) + '"></span></span>' +
+        '<span class="track"><span class="bar" style="width:' + Math.max(3, Math.min(100, it.rate / cap * 100)) + "%;background:" + colorOf(cls[it.id]) + '"></span></span>' +
         '<span class="val">' + fmtVal(it.rate) + "</span></button>";
     }).join("") + "</div>";
   }
@@ -538,21 +696,23 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
       var B = D.boroughs[state.borough];
       if (state.ward) {
         var W = D.wards[state.ward];
-        h += "<h2>" + esc(W.name) + '</h2><p class="alt">' + esc(fmt(l.wardOf, { b: bName(B) })) + "</p>" + statsBlock(W) + breakdown(W);
+        h += "<h2>" + esc(W.name) + popTag(state.ward) + '</h2><p class="alt">' + esc(fmt(l.wardOf, { b: bName(B) })) + "</p>" + statsBlock(W) + parkList(state.ward) + breakdown(W);
       } else {
         h += "<h2>" + esc(bName(B)) + '</h2><p class="alt">' + esc(bAlt(B)) + "</p>" + statsBlock(B) + breakdown(B);
       }
       h += "<h3>" + esc(l.rankWards) + '</h3><p class="hint">' + esc(l.hintWards) + "</p>";
       h += rankList(Object.keys(D.wards).filter(function (w) { return D.wards[w].b === state.borough; }).map(function (w) {
-        return { id: w, rate: rate(D.wards[w]), label: esc(D.wards[w].name) };
+        return { id: w, rate: rate(D.wards[w]), label: esc(D.wards[w].name) + (inScope(w) ? "" : '<span class="flag">' + esc(fmt(L().outScope, { t: state.scope })) + "</span>") + parkTag(w) + popTag(w) };
       }), state.ward);
     }
     $("side").innerHTML = h;
   }
 
   function renderLegend() {
-    $("legend").innerHTML = esc(fmt(L().legendHead, { m: mLbl() })) + '<div class="sw">' + [1, 2, 3, 4, 5].map(function (i) { return '<span style="background:var(--c' + i + ')"></span>'; }).join("") +
-      '</div><div class="ends"><span>' + esc(L().less) + "</span><span>" + esc(L().more) + "</span></div>";
+    var sc = scaleOf(levelOfItems()), c = sc.cuts.map(fmtVal);
+    $("legend").innerHTML = esc(fmt(L()[state.metric !== "rate" ? "legendHeadCount" : state.scope !== "all" ? "legendHeadNear" : "legendHead"], { m: mLbl(), lvl: L().levels[levelOfItems()], t: state.scope })) +
+      '<div class="sw">' + [1, 2, 3, 4, 5].map(function (i) { return '<span style="background:var(--c' + i + ')"></span>'; }).join("") +
+      '</div><div class="cuts"><span>&lt;' + c[0] + "</span><span>" + c[1] + "</span><span>" + c[2] + "</span><span>&gt;" + c[3] + "</span></div>";
   }
 
   // ── navigation ───────────────────────────────────────────────
@@ -646,12 +806,19 @@ h3 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.
     $("cat").innerHTML = D.cats.map(function (k) {
       return '<button type="button" data-v="' + k + '"' + (k === state.cat ? ' class="on"' : "") + ">" + esc(L().cats[k]) + "</button>";
     }).join("");
+    $("scope").innerHTML = ["all", "40", "60"].map(function (k) {
+      return '<button type="button" data-v="' + k + '"' + (k === state.scope ? ' class="on"' : "") + ">" + esc(L().scopes[k]) + "</button>";
+    }).join("");
     $("metric").innerHTML = ["rate", "count"].map(function (k) {
       return '<button type="button" data-v="' + k + '"' + (k === state.metric ? ' class="on"' : "") + ">" + esc(L().metrics[k]) + "</button>";
     }).join("");
     $("metricNote").hidden = state.metric !== "count";
     $("metricNote").textContent = L().metricNote;
   }
+  $("scope").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    state.scope = b.dataset.v; renderCats(); render(false);
+  });
   $("metric").addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (!b) return;
     state.metric = b.dataset.v; renderCats(); render(false);

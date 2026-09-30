@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Parks with playgrounds within 40 min of Imperial</name>
+    <description>Parks containing a children's playground within about 40 minutes by public transport from Imperial College South Kensington (TfL Journey Planner, weekday 10:00), ranked by the ward's recorded crime per 1,000 residents (Met Police, 2026-01 to 2026-08). Park and playground data © OpenStreetMap contributors.</description>
+    <Placemark>
+      <name>1. Bishop's Park</name>
+      <description><![CDATA[Ward: Palace & Hurlingham (Hammersmith and Fulham)<br>Ward crime: 38.1 per 1,000 residents, 426 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 39 min<br>Playgrounds in park (OpenStreetMap): 3<br>https://www.openstreetmap.org/way/4380345]]></description>
+      <Point><coordinates>-0.21518,51.47093,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>2. Hurlingham Park</name>
+      <description><![CDATA[Ward: Palace & Hurlingham (Hammersmith and Fulham)<br>Ward crime: 38.1 per 1,000 residents, 426 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 39 min<br>Playgrounds in park (OpenStreetMap): 2<br>https://www.openstreetmap.org/way/4252522]]></description>
+      <Point><coordinates>-0.20209,51.46898,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>3. South Park</name>
+      <description><![CDATA[Ward: Palace & Hurlingham (Hammersmith and Fulham)<br>Ward crime: 38.1 per 1,000 residents, 426 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 40 min<br>Playgrounds in park (OpenStreetMap): 2 — equipment: climbingframe<br>https://www.openstreetmap.org/way/4252532]]></description>
+      <Point><coordinates>-0.1946,51.4694,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>4. Marcus Garvey Park</name>
+      <description><![CDATA[Ward: Avonmore (Hammersmith and Fulham)<br>Ward crime: 43.6 per 1,000 residents, 328 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 21 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/98366239]]></description>
+      <Point><coordinates>-0.20936,51.49449,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>5. Acton Green Common</name>
+      <description><![CDATA[Ward: Southfield (Ealing)<br>Ward crime: 44.0 per 1,000 residents, 725 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 36 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/22696907]]></description>
+      <Point><coordinates>-0.26363,51.49549,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>6. Homefield Recreation Ground North</name>
+      <description><![CDATA[Ward: Chiswick Homefields (Hounslow)<br>Ward crime: 47.6 per 1,000 residents, 654 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 39 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/22697257]]></description>
+      <Point><coordinates>-0.25002,51.48954,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>7. Imperial Park</name>
+      <description><![CDATA[Ward: Sands End (Hammersmith and Fulham)<br>Ward crime: 49.3 per 1,000 residents, 549 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 37 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/97503323]]></description>
+      <Point><coordinates>-0.18325,51.47107,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>8. William Parnell Park</name>
+      <description><![CDATA[Ward: Sands End (Hammersmith and Fulham)<br>Ward crime: 49.3 per 1,000 residents, 549 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 37 min<br>Playgrounds in park (OpenStreetMap): 3<br>https://www.openstreetmap.org/way/4422151]]></description>
+      <Point><coordinates>-0.18888,51.47354,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>9. Rush Common Woodland Walk</name>
+      <description><![CDATA[Ward: Brixton Rush Common (Lambeth)<br>Ward crime: 50.0 per 1,000 residents, 746 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 35 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/109935442]]></description>
+      <Point><coordinates>-0.11745,51.45775,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>10. St. Matthew's Church Gardens</name>
+      <description><![CDATA[Ward: Brixton Rush Common (Lambeth)<br>Ward crime: 50.0 per 1,000 residents, 746 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 35 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/24938849]]></description>
+      <Point><coordinates>-0.11598,51.45992,0</coordinates></Point>
+    </Placemark>
+  </Document>
+</kml>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Parks with playgrounds within 30 min of Imperial</name>
+    <description>Parks containing a children's playground within about 30 minutes by public transport from Imperial College South Kensington (TfL Journey Planner, weekday 10:00), ranked by the ward's recorded crime per 1,000 residents (Met Police, 2026-01 to 2026-08). Park and playground data © OpenStreetMap contributors.</description>
+    <Placemark>
+      <name>1. Marcus Garvey Park</name>
+      <description><![CDATA[Ward: Avonmore (Hammersmith and Fulham)<br>Ward crime: 43.6 per 1,000 residents, 328 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 21 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/98366239]]></description>
+      <Point><coordinates>-0.20936,51.49449,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>2. Redcliffe Square Gardens</name>
+      <description><![CDATA[Ward: Redcliffe (Kensington and Chelsea)<br>Ward crime: 53.2 per 1,000 residents, 489 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 19 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/32865592]]></description>
+      <Point><coordinates>-0.18838,51.48818,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>3. Holland Park</name>
+      <description><![CDATA[Ward: Holland (Kensington and Chelsea)<br>Ward crime: 54.6 per 1,000 residents, 497 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 23 min<br>Playgrounds in park (OpenStreetMap): 3<br>https://www.openstreetmap.org/way/8137262]]></description>
+      <Point><coordinates>-0.20319,51.50249,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>4. Normand Park</name>
+      <description><![CDATA[Ward: Fulham Reach (Hammersmith and Fulham)<br>Ward crime: 73.1 per 1,000 residents, 889 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 29 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/94221095]]></description>
+      <Point><coordinates>-0.20719,51.48464,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>5. Brook Green</name>
+      <description><![CDATA[Ward: Brook Green (Hammersmith and Fulham)<br>Ward crime: 77.9 per 1,000 residents, 643 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 28 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/25605582]]></description>
+      <Point><coordinates>-0.21951,51.49602,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>6. Causton Street Playground</name>
+      <description><![CDATA[Ward: Vincent Square (Westminster)<br>Ward crime: 82.4 per 1,000 residents, 851 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 28 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/4259910]]></description>
+      <Point><coordinates>-0.13126,51.49104,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>7. St Luke's Gardens</name>
+      <description><![CDATA[Ward: Stanley (Kensington and Chelsea)<br>Ward crime: 96.5 per 1,000 residents, 828 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 16 min<br>Playgrounds in park (OpenStreetMap): 1 — equipment: trampoline, structure<br>https://www.openstreetmap.org/way/38215812]]></description>
+      <Point><coordinates>-0.16915,51.48974,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>8. Kensington Gardens</name>
+      <description><![CDATA[Ward: Lancaster Gate (Westminster)<br>Ward crime: 123.2 per 1,000 residents, 1349 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 13 min<br>Playgrounds in park (OpenStreetMap): 2 — equipment: structure<br>https://www.openstreetmap.org/way/3986346]]></description>
+      <Point><coordinates>-0.17988,51.50617,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>9. Colville Square Gardens</name>
+      <description><![CDATA[Ward: Colville (Kensington and Chelsea)<br>Ward crime: 129.1 per 1,000 residents, 1107 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 25 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/23591871]]></description>
+      <Point><coordinates>-0.20372,51.51567,0</coordinates></Point>
+    </Placemark>
+    <Placemark>
+      <name>10. Powis Square</name>
+      <description><![CDATA[Ward: Colville (Kensington and Chelsea)<br>Ward crime: 129.1 per 1,000 residents, 1107 crimes, 2026-01 to 2026-08<br>Public transport from Imperial (South Kensington): about 27 min<br>Playgrounds in park (OpenStreetMap): 1<br>https://www.openstreetmap.org/way/23591864]]></description>
+      <Point><coordinates>-0.20142,51.51609,0</coordinates></Point>
+    </Placemark>
+  </Document>
+</kml>
