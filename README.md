@@ -11,6 +11,8 @@ sub-regions (Central, North, East, South, West), click into a borough, then into
 - Parks with a children's playground (OpenStreetMap), with public-transport time from Imperial College
   South Kensington (TfL Journey Planner) and a filter for wards within 40 or 60 minutes
 - Flags for wards with few residents or fast population growth since the 2021 Census
+- Colour by **deprivation** (English Indices of Deprivation 2025) or **poor + high crime**: each ward's
+  London-wide percentile for deprivation and for the chosen crime type, scored by the lower of the two
 
 No build step and no dependencies — it's one HTML file plus a generated data file.
 
@@ -43,6 +45,12 @@ so only new parks are queried):
 node scripts/build-parks.js
 ```
 
+Then rebuild the deprivation data (ward and borough scores, and the neighbourhood each park sits in):
+
+```bash
+node scripts/build-deprivation.js
+```
+
 ## Data sources
 
 | Data | Source |
@@ -52,6 +60,9 @@ node scripts/build-parks.js
 | Ward and borough boundaries (Dec 2022) | [ONS Open Geography Portal](https://geoportal.statistics.gov.uk/) |
 | Ward population estimates (mid-year, 2021-based) | [Nomis](https://www.nomisweb.co.uk/) |
 | Parks, playgrounds, play equipment | © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), via Overpass API |
+| Deprivation (IMD 2025, IDACI) by 2021 LSOA | MHCLG, [English indices of deprivation 2025](https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025) |
+| LSOA (2021) → ward (2022) lookup | [ONS Open Geography Portal](https://geoportal.statistics.gov.uk/) |
+| Park → LSOA (nearest postcode) | [postcodes.io](https://postcodes.io/) |
 | Journey times from Imperial | [TfL Journey Planner](https://api.tfl.gov.uk/) — powered by TfL Open Data |
 
 Contains Metropolitan Police Service data and Office for National Statistics data licensed
